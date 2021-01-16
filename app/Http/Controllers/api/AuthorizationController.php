@@ -22,7 +22,14 @@ class AuthorizationController extends Controller
 
         $accessToken = $user->createToken('authToken')->accessToken;
 
-        return response(['user' => $user, 'access_token' => $accessToken]);
+        return response([
+            'user' => $user,
+            'access_token' => $accessToken,
+            'message' => [
+                __('User registered'),
+                __('Thank you for registration. You can login with registered used through login link'),
+            ]
+        ]);
     }
 
     public function login(Request $request)
@@ -33,7 +40,7 @@ class AuthorizationController extends Controller
         ]);
 
         if (!auth()->attempt($loginData)) {
-            return response(['message' => 'Invalid Credentials']);
+            return response(['message' => 'Invalid Credentials'],422);
         }
 
         $accessToken = auth()->user()->createToken('authToken')->accessToken;
