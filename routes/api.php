@@ -27,3 +27,8 @@ Route::middleware('api')->get('/test', function (Request $request) {
 
 Route::middleware('api')->post('/register', [\App\Http\Controllers\api\AuthorizationController::class, 'register'])->name('api.register');
 Route::middleware('api')->post('/login', [\App\Http\Controllers\api\AuthorizationController::class, 'login'])->name('api.login');
+Route::middleware('auth:api')->get('/test-close', function (Request $request) {
+    return [
+        'data'=>'close api route testing connection',
+    ];
+});
