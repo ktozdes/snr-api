@@ -1,10 +1,10 @@
 /node_modules
 /public/hot
 /public/storage
-/storage/cache
-/storage/sessions
-/storage/views
-/storage/testing
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/views
+/storage/framework/testing
 /storage/*.key
 /vendor
 .idea
