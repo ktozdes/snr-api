@@ -41,4 +41,32 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    //protected $with = ['user_role.role_permissions'];
+
+    public function userRole() {
+        return $this->hasOne(UserRole::class, 'id', 'user_role_id');
+    }
+    public function permission($perm_str, $module) {
+        $role_perm = null;
+        foreach ($this->userRole->rolePermissions as $perm) {
+            if ($perm->permission_const_id == $module) {
+                $role_perm = $perm;
+            }
+        }
+        if (!isset($role_perm)) return false;
+        return RolePermission::checkPermission($perm_str, $role_perm->permissions);
+    }
+
+    public function simplePermission($module) {
+        $role_perm = null;
+        foreach ($this->userRole->rolePermissions as $perm) {
+            if ($perm->permission_const_id == $module) {
+                $role_perm = $perm;
+            }
+        }
+
+        if (!isset($role_perm)) return false;
+        return $role_perm->permissions;
+    }
 }

@@ -31,5 +31,15 @@ class AuthServiceProvider extends ServiceProvider
         Passport::tokensExpireIn(now()->addDays(30));
         Passport::refreshTokensExpireIn(now()->addDays(90));
         Passport::personalAccessTokensExpireIn(now()->addMonths(12));
+
+        $this->registerPolicies();
+
+        Gate::define('user', function ($user, $perm_str) {
+            return $user->perm($perm_str, config('constants.permissions.Users'));
+        });
+
+        Gate::define('user-roles', function ($user, $perm_str) {
+            return $user->perm($perm_str, config('constants.permissions.User Roles'));
+        });
     }
 }
