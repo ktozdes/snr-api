@@ -42,11 +42,42 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    //protected $with = ['user_role.role_permissions'];
+    //protected $with = ['userRole.rolePermissions'];
 
     public function userRole() {
         return $this->hasOne(UserRole::class, 'id', 'user_role_id');
     }
+
+    public function getPermissionsAttribute()
+    {
+        $permissions = config('constants.permissions');
+        $rolePermissions = $this->userRole->rolePermissions->keyBy('permission_const_id');
+        $returnValue = [];
+        foreach ($permissions as $perm => $val) {
+            $permissions_arr[$perm] = [];
+            if (isset($rolePermissions[$val])) {
+                $returnValue[$perm] =[
+                    'id' =>  $val,
+                    'name' =>  $perm,
+                    'can_view' => RolePermission::checkPermission('view', $rolePermissions[$val]->permissions),
+                    'can_create' => RolePermission::checkPermission('create', $rolePermissions[$val]->permissions),
+                    'can_edit' => RolePermission::checkPermission('edit', $rolePermissions[$val]->permissions),
+                    'can_delete' => RolePermission::checkPermission('delete', $rolePermissions[$val]->permissions)
+                ];
+            } else {
+                $returnValue[$perm] =[
+                    'id' =>  $val,
+                    'name' =>  $perm,
+                    'can_view' => false,
+                    'can_create' => false,
+                    'can_edit' => false,
+                    'can_delete' => false
+                ];
+            }
+        }
+        return $returnValue;
+    }
+
     public function permission($perm_str, $module) {
         $role_perm = null;
         foreach ($this->userRole->rolePermissions as $perm) {

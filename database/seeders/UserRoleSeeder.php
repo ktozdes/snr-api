@@ -34,6 +34,16 @@ class UserRoleSeeder extends Seeder
                     'permission_const_id' => $value,
                     'permissions' => '1111'
                 ]);
+                RolePermission::create([
+                    'user_role_id' => $operator->id,
+                    'permission_const_id' => $value,
+                    'permissions' => '1110'
+                ]);
+                RolePermission::create([
+                    'user_role_id' => $client->id,
+                    'permission_const_id' => $value,
+                    'permissions' => '1000'
+                ]);
             } else {
                 RolePermission::create([
                     'user_role_id' => 1,

@@ -12,10 +12,15 @@
 5) run `php artisan migrate`. This command will populate database
 6) run `php artisan key:generate`
 7) run `php artisan passport:keys`
+8) run `php artisan passport:client --personal`
+
 
 In some cases (Linux, Mac) you might have to change permission for directory `storage` to 777 recursively.
 <br/>
 Also you might have to create folders as `cache`, `testing`, `views`, `sessions` inside `storage/framework` directory
+<br/>
+If you reseed or start with clean database, please run following after migration, but before db:seed
+`php artisan passport:client --personal`
 
 ## Side notes
 

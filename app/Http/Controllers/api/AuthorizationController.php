@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Http\Request;
 
 class AuthorizationController extends Controller
@@ -17,7 +18,7 @@ class AuthorizationController extends Controller
         ]);
 
         $validatedData['password'] = bcrypt($request->password);
-
+        $validatedData['user_role_id'] = UserRole::where('name', 'client')->first()->id;
         $user = User::create($validatedData);
 
         $accessToken = $user->createToken('authToken')->accessToken;
@@ -44,8 +45,7 @@ class AuthorizationController extends Controller
         }
 
         $accessToken = auth()->user()->createToken('authToken')->accessToken;
-
-        return response(['user' => auth()->user(), 'access_token' => $accessToken]);
+        return response(['user' => auth()->user()->only(['id', 'name', 'email']), 'permissions'=>auth()->user()->permissions, 'access_token' => $accessToken]);
 
     }
 }

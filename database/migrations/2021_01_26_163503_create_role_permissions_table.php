@@ -15,7 +15,10 @@ class CreateRolePermissionsTable extends Migration
     {
         Schema::create('role_permissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_role_id');
+            $table->foreignId('user_role_id')
+            ->constrained()
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->integer('permission_const_id');
             $table->integer('permissions');
             $table->timestamps();
@@ -29,6 +32,9 @@ class CreateRolePermissionsTable extends Migration
      */
     public function down()
     {
+        Schema::table('role_permissions', function (Blueprint $table) {
+            $table->dropForeign(['user_role_id']);
+        });
         Schema::dropIfExists('role_permissions');
     }
 }

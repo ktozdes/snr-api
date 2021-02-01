@@ -22,7 +22,7 @@ Route::middleware('auth:api')->group(function () {
         // Matches The "/admin/users" URL
     });
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return response(['user' => $request->user(), 'permissions'=>$request->user()->permissions]);
     });
 
     Route::prefix('role')->group(function () {

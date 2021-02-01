@@ -5,5 +5,6 @@ return [
     	'Users' => 1,
     	'User Roles' => 2,
         'Addresses' => 3,
+        'Words' => 4,
     ],
 ];
