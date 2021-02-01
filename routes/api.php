@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\api\UserRoleController;
 use \App\Http\Controllers\api\RolePermissionController;
 use \App\Http\Controllers\api\AuthorizationController;
+use \App\Http\Controllers\api\WordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,12 @@ Route::middleware('auth:api')->group(function () {
         Route::post('store', [UserRoleController::class, 'store'])->name('api.role.store');
         Route::post('update/{userRole}', [UserRoleController::class, 'update'])->name('api.role.update');
         Route::delete('destroy/{userRole}', [UserRoleController::class, 'destroy'])->name('api.role.destroy');
+    });
+
+    Route::prefix('word')->group(function () {
+        Route::get('/', [WordController::class, 'index'])->name('api.word.index');
+        Route::post('store', [WordController::class, 'store'])->name('api.word.store');
+        Route::delete('destroy/{id}', [WordController::class, 'destroy'])->name('api.word.destroy');
     });
 
     Route::get('/test-close', function (Request $request) {
