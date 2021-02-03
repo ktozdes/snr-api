@@ -36,6 +36,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('word')->group(function () {
         Route::get('/', [WordController::class, 'index'])->name('api.word.index');
         Route::post('store', [WordController::class, 'store'])->name('api.word.store');
+        Route::post('mass-store', [WordController::class, 'massStore'])->name('api.word.mass-store');
         Route::delete('destroy/{id}', [WordController::class, 'destroy'])->name('api.word.destroy');
     });
 

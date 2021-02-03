@@ -62,6 +62,42 @@ class WordController extends Controller
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param ParserInterface $parserInterface
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function massStore(Request $request, ParserInterface $parserInterface)
+    {
+        if (isset($request->words) && count($request->words) > 0) {
+            foreach ($request->words as $word) {
+                $result = $parserInterface->post('api/word.create', json_encode([
+                    'word'=> $word['word'],
+                    'positive'=> $word['positive_total'],
+                    'neutral'=> $word['neutral_total'],
+                    'negative'=> $word['negative_total'],
+                    'amount'=> ($word['positive_total'] + $word['neutral_total'] + $word['negative_total']),
+                ]) );
+            }
+        }
+
+        return (isset($result->id))
+            ? response()->json([
+                'result' => $result,
+                'success_message' => [
+                    __('Words created'),
+                ]
+            ])
+            : response()->json([
+                'result' => $result,
+                'error_message' => [
+                    __('Something went wrong')
+                ]
+            ]);
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param  int  $id
