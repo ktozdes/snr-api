@@ -6,6 +6,8 @@ use \App\Http\Controllers\api\UserRoleController;
 use \App\Http\Controllers\api\RolePermissionController;
 use \App\Http\Controllers\api\AuthorizationController;
 use \App\Http\Controllers\api\WordController;
+use \App\Http\Controllers\api\PostController;
+use \App\Http\Controllers\api\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +40,13 @@ Route::middleware('auth:api')->group(function () {
         Route::post('store', [WordController::class, 'store'])->name('api.word.store');
         Route::post('mass-store', [WordController::class, 'massStore'])->name('api.word.mass-store');
         Route::delete('destroy/{id}', [WordController::class, 'destroy'])->name('api.word.destroy');
+    });
+
+    Route::prefix('post')->group(function () {
+        Route::get('/', [PostController::class, 'index'])->name('api.post.index');
+    });
+    Route::prefix('comment')->group(function () {
+        Route::get('/{postID}', [CommentController::class, 'index'])->name('api.comment.index');
     });
 
     Route::get('/test-close', function (Request $request) {

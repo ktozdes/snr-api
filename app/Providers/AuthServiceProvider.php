@@ -45,5 +45,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('posts', function ($user, $perm_str) {
             return $user->perm($perm_str, config('constants.permissions.Posts'));
         });
+
+        Gate::define('comments', function ($user, $perm_str) {
+            return $user->perm($perm_str, config('constants.permissions.Comments'));
+        });
     }
 }

@@ -7,5 +7,6 @@ return [
         'Addresses' => 3,
         'Words' => 4,
         'Posts' => 5,
+        'Comments' => 6,
     ],
 ];

@@ -28,29 +28,21 @@ class UserRoleSeeder extends Seeder
         $permissions = config('constants.permissions');
 
         foreach ($permissions as $key => $value) {
-            if ($value > 0) {
-                RolePermission::create([
-                    'user_role_id' => $admin->id,
-                    'permission_const_id' => $value,
-                    'permissions' => '1111'
-                ]);
-                RolePermission::create([
-                    'user_role_id' => $operator->id,
-                    'permission_const_id' => $value,
-                    'permissions' => '1110'
-                ]);
-                RolePermission::create([
-                    'user_role_id' => $client->id,
-                    'permission_const_id' => $value,
-                    'permissions' => '1000'
-                ]);
-            } else {
-                RolePermission::create([
-                    'user_role_id' => 1,
-                    'permission_const_id' => $value,
-                    'permissions' => '1'
-                ]);
-            }
+            RolePermission::create([
+                'user_role_id' => $admin->id,
+                'permission_const_id' => $value,
+                'permissions' => '1111'
+            ]);
+            RolePermission::create([
+                'user_role_id' => $operator->id,
+                'permission_const_id' => $value,
+                'permissions' => '1110'
+            ]);
+            RolePermission::create([
+                'user_role_id' => $client->id,
+                'permission_const_id' => $value,
+                'permissions' => '1000'
+            ]);
         }
     }
 }

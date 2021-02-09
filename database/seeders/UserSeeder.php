@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -14,12 +15,12 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-
+        $userRoles = UserRole::all();
         $admin = User::create([
             'name' => 'admin',
             'email' => 'admin@test.loc',
             'password' => bcrypt('pass'),
-            'user_role_id' => 1
+            'user_role_id' => $userRoles->where('name', 'administrator')->first()->id
         ]);
         $admin->createToken('authToken')->accessToken;
 
@@ -27,7 +28,7 @@ class UserSeeder extends Seeder
             'name' => 'operator',
             'email' => 'operator@test.loc',
             'password' => bcrypt('pass'),
-            'user_role_id' => 2
+            'user_role_id' => $userRoles->where('name', 'operator')->first()->id
         ]);
         $operator->createToken('authToken')->accessToken;
 
@@ -35,7 +36,7 @@ class UserSeeder extends Seeder
             'name' => 'client',
             'email' => 'client@test.loc',
             'password' => bcrypt('pass'),
-            'user_role_id' => 3
+            'user_role_id' => $userRoles->where('name', 'client')->first()->id
         ]);
         $client->createToken('authToken')->accessToken;
 
