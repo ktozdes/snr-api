@@ -19,8 +19,7 @@ class PostController extends Controller
     {
         $filter = [
             'page' => 1,
-            'count' => 3,
-            'author_username'=> "news.kg"
+            'count' => 50,
         ];
         $result = $parserInterface->post('api/post.get_posts', (string)json_encode($filter));
         $posts = Post::hydrate($result->list);
