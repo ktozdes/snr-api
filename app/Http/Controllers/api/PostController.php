@@ -26,7 +26,10 @@ class PostController extends Controller
         $posts = Post::hydrate($result->list);
         return response()->json([
             'items' => $posts,
-            'result' => $result
+            'pagination' => [
+                'total' => $result->total,
+                'page_count' => $result->page_count
+            ]
         ]);
 
 //        $result = $parserInterface->post('api/post.get_posts', '{"count": 50,"page": 1,"author_username": "news.kg"}');

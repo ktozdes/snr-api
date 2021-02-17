@@ -9,10 +9,11 @@
 2) cd into `snc-api` directory
 3) run `composer install`
 4) copy `env.example` as `.env` and change database connection accordingly
-5) run `php artisan migrate`. This command will populate database
-6) run `php artisan key:generate`
-7) run `php artisan passport:keys`
-8) run `php artisan passport:client --personal`
+5) run `php artisan passport:install` command
+6) run `php artisan migrate`. This command will populate database
+7) run `php artisan key:generate`
+8) run `php artisan passport:keys`
+9) run `php artisan passport:client --personal`
 
 
 In some cases (Linux, Mac) you might have to change permission for directory `storage` to 777 recursively.

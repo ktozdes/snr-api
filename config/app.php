@@ -133,7 +133,7 @@ return [
     'api' => 'python',
 
     'python' => [
-        'dev_url' => 'http://localhost:5050'
+        'dev_url' => env('PARSER_DEV_URL')
     ],
 
     /*
