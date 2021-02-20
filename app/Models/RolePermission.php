@@ -9,7 +9,7 @@ class RolePermission extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_role_id', 'permission_const_id', 'permissions'
+        'name', 'user_role_id', 'permission_const_id', 'permissions'
     ];
 
     public static function checkPermission($permissionString, $permVal)

@@ -13,20 +13,20 @@ class PostController extends Controller
      * Display a listing of the resource.
      *
      * @param ParserInterface $parserInterface
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(ParserInterface $parserInterface)
+    public function index(ParserInterface $parserInterface, Request $request)
     {
         $filter = [
-            'page' => 1,
-            'count' => 50,
+            'page' => (int) $request->page ?? 1,
+            'count' => $this->perPage,
         ];
         $result = $parserInterface->post('api/post.get_posts', (string)json_encode($filter));
         $posts = Post::hydrate($result->list);
         return response()->json([
             'items' => $posts,
             'pagination' => [
-                'total' => $result->total,
                 'page_count' => $result->page_count
             ]
         ]);

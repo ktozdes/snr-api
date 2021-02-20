@@ -57,4 +57,22 @@ class PythonParserAdapter implements ParserInterface
 //        $request = $this->client->post(['body'=>[]]);
 //        $response = $request->send();
     }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function getFile($url)
+    {
+        try {
+            $response = $this->client->request('GET', $url, [
+    'headers' => ['Content-Type' => 'image/jpeg']]);
+            return $response->getBody()->getContents();
+
+        } catch (\Exception $e) {
+            throw new Exception();
+        }
+    }
 }

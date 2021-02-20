@@ -29,16 +29,19 @@ class UserRoleSeeder extends Seeder
 
         foreach ($permissions as $key => $value) {
             RolePermission::create([
+                'name' => $key,
                 'user_role_id' => $admin->id,
                 'permission_const_id' => $value,
                 'permissions' => '1111'
             ]);
             RolePermission::create([
+                'name' => $key,
                 'user_role_id' => $operator->id,
                 'permission_const_id' => $value,
                 'permissions' => '1110'
             ]);
             RolePermission::create([
+                'name' => $key,
                 'user_role_id' => $client->id,
                 'permission_const_id' => $value,
                 'permissions' => '1000'

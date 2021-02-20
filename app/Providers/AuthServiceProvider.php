@@ -35,19 +35,19 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define('user', function ($user, $perm_str) {
-            return $user->perm($perm_str, config('constants.permissions.Users'));
+            return $user->perm($perm_str, config('constants.permissions.User'));
         });
 
-        Gate::define('user-roles', function ($user, $perm_str) {
-            return $user->perm($perm_str, config('constants.permissions.User Roles'));
+        Gate::define('user-role', function ($user, $perm_str) {
+            return $user->perm($perm_str, config('constants.permissions.User Role'));
         });
 
-        Gate::define('posts', function ($user, $perm_str) {
-            return $user->perm($perm_str, config('constants.permissions.Posts'));
+        Gate::define('post', function ($user, $perm_str) {
+            return $user->perm($perm_str, config('constants.permissions.Post'));
         });
 
-        Gate::define('comments', function ($user, $perm_str) {
-            return $user->perm($perm_str, config('constants.permissions.Comments'));
+        Gate::define('comment', function ($user, $perm_str) {
+            return $user->perm($perm_str, config('constants.permissions.Comment'));
         });
     }
 }

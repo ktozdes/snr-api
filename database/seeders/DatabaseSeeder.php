@@ -14,15 +14,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call([
-            UserRoleSeeder::class,
-            UserSeeder::class,
-        ]);
         if (!App::environment('production')) {
             $this->call([
                 OrganizationSeeder::class,
                 KeywordSeeder::class,
             ]);
+        $this->call([
+            UserRoleSeeder::class,
+            UserSeeder::class,
+        ]);
         }
     }
 }

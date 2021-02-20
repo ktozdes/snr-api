@@ -50,24 +50,23 @@ class User extends Authenticatable
 
     public function getPermissionsAttribute()
     {
-        $permissions = config('constants.permissions');
+        $permissions = RolePermission::all();
         $rolePermissions = $this->userRole->rolePermissions->keyBy('permission_const_id');
         $returnValue = [];
-        foreach ($permissions as $perm => $val) {
-            $permissions_arr[$perm] = [];
-            if (isset($rolePermissions[$val])) {
-                $returnValue[$perm] =[
-                    'id' =>  $val,
-                    'name' =>  $perm,
-                    'can_view' => RolePermission::checkPermission('view', $rolePermissions[$val]->permissions),
-                    'can_create' => RolePermission::checkPermission('create', $rolePermissions[$val]->permissions),
-                    'can_edit' => RolePermission::checkPermission('edit', $rolePermissions[$val]->permissions),
-                    'can_delete' => RolePermission::checkPermission('delete', $rolePermissions[$val]->permissions)
+        foreach ($permissions as $perm => $permission) {
+            if (isset($rolePermissions[$permission->permission_const_id])) {
+                $returnValue[$permission->name] =[
+                    'id' =>  $permission->permission_const_id,
+                    'name' =>  $permission->name,
+                    'can_view' => RolePermission::checkPermission('view', $rolePermissions[$permission->permission_const_id]->permissions),
+                    'can_create' => RolePermission::checkPermission('create', $rolePermissions[$permission->permission_const_id]->permissions),
+                    'can_edit' => RolePermission::checkPermission('edit', $rolePermissions[$permission->permission_const_id]->permissions),
+                    'can_delete' => RolePermission::checkPermission('delete', $rolePermissions[$permission->permission_const_id]->permissions)
                 ];
             } else {
-                $returnValue[$perm] =[
-                    'id' =>  $val,
-                    'name' =>  $perm,
+                $returnValue[$permission->name] =[
+                    'id' =>  $permission->permission_const_id,
+                    'name' =>  $permission->name,
                     'can_view' => false,
                     'can_create' => false,
                     'can_edit' => false,

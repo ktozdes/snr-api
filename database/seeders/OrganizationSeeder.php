@@ -16,7 +16,6 @@ class OrganizationSeeder extends Seeder
     {
         Organization::factory()
             ->count(10)
-            ->hasPosts(1)
             ->create();
     }
 }
