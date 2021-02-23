@@ -9,7 +9,7 @@ class Comment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['date', 'post_id', 'like_count', 'code', 'author_username', 'content', 'process_type'];
+    protected $fillable = ['date', 'post_id', 'like_count', 'code', 'author_username', 'content', 'process_type', 'positive', 'neutral', 'negative', 'words'];
     protected $dates = ['date'];
     protected $appends = ['formatted_date'];
 

@@ -64,20 +64,21 @@ class WordController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @param ParserInterface $parserInterface
+     * @param int $commentID
      * @return \Illuminate\Http\JsonResponse
      */
-    public function massStore(Request $request, ParserInterface $parserInterface)
+    public function massStore(Request $request, ParserInterface $parserInterface, int $commentID)
     {
-        if (isset($request->words) && count($request->words) > 0) {
+        $result = false;
+        if (isset($request->words) && count($request->words) > 0 && is_numeric($commentID)) {
             foreach ($request->words as $word) {
-                $result = $parserInterface->post('api/word.create', json_encode([
+                $result = $parserInterface->post('api/post.add_word', json_encode([
                     'word'=> $word['word'],
-                    'positive'=> $word['positive_total'],
-                    'neutral'=> $word['neutral_total'],
-                    'negative'=> $word['negative_total'],
-                    'amount'=> ($word['positive_total'] + $word['neutral_total'] + $word['negative_total']),
+                    'comment_id'=> $commentID,
+                    'type'=> $word['type'],
+                    'index'=> $word['index'],
                 ]) );
             }
         }

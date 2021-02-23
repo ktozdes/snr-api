@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Models\Comment;
 use App\Models\Post;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Interfaces\ParserInterface;
@@ -14,15 +15,16 @@ class CommentController extends Controller
      * Display a listing of the resource.
      *
      * @param ParserInterface $parserInterface
-     * @param Post $post
-     * @return \Illuminate\Http\JsonResponse
+     * @param int $postID
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function index(ParserInterface $parserInterface, int $postID)
+    public function index(ParserInterface $parserInterface, int $postID, Request $request)
     {
         if (is_numeric($postID) && $postID > 0){
             $filter = [
                 'post_id' => $postID,
-                'page' => 1,
+                'page' => (int) $request->page ?? 1,
                 'count' => $this->perPage,
             ];
             $result = $parserInterface->post('api/post.get_comments', (string) json_encode($filter));

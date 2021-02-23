@@ -55,7 +55,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('word')->group(function () {
         Route::get('/', [WordController::class, 'index'])->name('api.word.index');
         Route::post('store', [WordController::class, 'store'])->name('api.word.store');
-        Route::post('mass-store', [WordController::class, 'massStore'])->name('api.word.mass-store');
+        Route::post('mass-store/{commentID}', [WordController::class, 'massStore'])->name('api.word.mass-store');
         Route::delete('destroy/{id}', [WordController::class, 'destroy'])->name('api.word.destroy');
     });
 
@@ -65,6 +65,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('post')->group(function () {
         Route::get('/', [PostController::class, 'index'])->name('api.post.index');
+        Route::get('/show/{postID}', [PostController::class, 'show'])->name('api.post.show');
     });
     Route::prefix('comment')->group(function () {
         Route::get('/{postID}', [CommentController::class, 'index'])->name('api.comment.index');

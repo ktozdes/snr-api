@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Post extends Model
 {
     use HasFactory;
-    protected $fillable = ['date', 'code', 'thumbnail', 'content', 'author_id', 'author_username', 'like_count'];
+    protected $fillable = ['date', 'code', 'thumbnail', 'content', 'author_id', 'author_username', 'like_count', 'positive', 'neutral', 'negative'];
     protected $dates = ['date'];
     protected $appends = ['formatted_date'];
 
