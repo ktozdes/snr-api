@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\RolePermission;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Passport\Passport;
+use Illuminate\Support\Str;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -34,20 +36,19 @@ class AuthServiceProvider extends ServiceProvider
 
         $this->registerPolicies();
 
-        Gate::define('user', function ($user, $perm_str) {
-            return $user->perm($perm_str, config('constants.permissions.User'));
-        });
-
-        Gate::define('user-role', function ($user, $perm_str) {
-            return $user->perm($perm_str, config('constants.permissions.User Role'));
-        });
-
-        Gate::define('post', function ($user, $perm_str) {
-            return $user->perm($perm_str, config('constants.permissions.Post'));
-        });
-
-        Gate::define('comment', function ($user, $perm_str) {
-            return $user->perm($perm_str, config('constants.permissions.Comment'));
-        });
+        $permissions = RolePermission::all();
+        foreach ($permissions as $singlePermission) {
+            Gate::define(Str::lower($singlePermission->name), function ($user, $action) use ($permissions, $singlePermission) {
+                $tmpPermission = $permissions
+                    ->where('name', $singlePermission->name)
+                    ->where('user_role_id', $user->user_role_id)
+                    ->first();
+                $result = RolePermission::checkPermission($action,
+                    (isset($tmpPermission->permissions) ? $tmpPermission->permissions : 0)
+                );
+                //echo $singlePermission->name. '--' . $user->user_role_id . '--'.$action .'--'. $tmpPermission->permissions. '=='. $result;
+                return $result;
+            });
+        }
     }
 }

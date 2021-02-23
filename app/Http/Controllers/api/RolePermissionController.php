@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\RolePermission;
 use App\Models\UserRole;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RolePermissionController extends Controller
 {
@@ -17,25 +18,29 @@ class RolePermissionController extends Controller
      */
     public function index(UserRole $userRole = null)
     {
+        Gate::authorize('permission', 'view');
         $permissions = config('constants.permissions');
-        if ( $userRole ) {
+
+        if ($userRole) {
+            $permissions = RolePermission::all();
             $rolePermissions = $userRole->rolePermissions->keyBy('permission_const_id');
             $returnValue = [];
-            foreach ($permissions as $perm => $val) {
-                $permissions_arr[$perm] = [];
-                if (isset($rolePermissions[$val])) {
-                    $returnValue[$perm] =[
-                        'id' =>  $val,
-                        'name' =>  $perm,
-                        'can_view' => RolePermission::checkPermission('view', $rolePermissions[$val]->permissions),
-                        'can_create' => RolePermission::checkPermission('create', $rolePermissions[$val]->permissions),
-                        'can_edit' => RolePermission::checkPermission('edit', $rolePermissions[$val]->permissions),
-                        'can_delete' => RolePermission::checkPermission('delete', $rolePermissions[$val]->permissions)
+//            print_r($rolePermissions);
+//            die;
+            foreach ($permissions as $singlePermission) {
+                if (isset($rolePermissions[$singlePermission->permission_const_id])) {
+                    $returnValue[$singlePermission->name] = [
+                        'id' => $singlePermission->id,
+                        'name' => $singlePermission->name,
+                        'can_view' => RolePermission::checkPermission('view', $rolePermissions[$singlePermission->permission_const_id]->permissions),
+                        'can_create' => RolePermission::checkPermission('create', $rolePermissions[$singlePermission->permission_const_id]->permissions),
+                        'can_edit' => RolePermission::checkPermission('edit', $rolePermissions[$singlePermission->permission_const_id]->permissions),
+                        'can_delete' => RolePermission::checkPermission('delete', $rolePermissions[$singlePermission->permission_const_id]->permissions)
                     ];
                 } else {
-                    $returnValue[$perm] =[
-                        'id' =>  $val,
-                        'name' =>  $perm,
+                    $returnValue[$singlePermission->name] = [
+                        'id' => $singlePermission->id,
+                        'name' => $singlePermission->name,
                         'can_view' => false,
                         'can_create' => false,
                         'can_edit' => false,
@@ -43,31 +48,31 @@ class RolePermissionController extends Controller
                     ];
                 }
             }
-            return response()->json( [
-                'items'=> $returnValue,
+            return response()->json([
+                'items' => $returnValue,
                 'role' => $userRole->getAttributes()
             ]);
         }
         $returnValue = [];
-        foreach ($permissions as $perm => $val) {
-            $returnValue[$perm] =[
-                'id' =>  $val,
-                'name' =>  null,
+        foreach ($permissions as $singlePermission) {
+            $returnValue[$singlePermission->name] = [
+                'id' => $singlePermission->id,
+                'name' => $singlePermission->name,
                 'can_view' => false,
                 'can_create' => false,
                 'can_edit' => false,
                 'can_delete' => false
             ];
         }
-        return response()->json( [
-            'items'=> $returnValue,
+        return response()->json([
+            'items' => $returnValue,
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -78,7 +83,7 @@ class RolePermissionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\RolePermission  $rolePermission
+     * @param \App\Models\RolePermission $rolePermission
      * @return \Illuminate\Http\Response
      */
     public function show(RolePermission $rolePermission)
@@ -89,8 +94,8 @@ class RolePermissionController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\RolePermission  $rolePermission
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\RolePermission $rolePermission
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, RolePermission $rolePermission)
@@ -101,7 +106,7 @@ class RolePermissionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\RolePermission  $rolePermission
+     * @param \App\Models\RolePermission $rolePermission
      * @return \Illuminate\Http\Response
      */
     public function destroy(RolePermission $rolePermission)

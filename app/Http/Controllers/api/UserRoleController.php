@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\RolePermission;
 use App\Models\UserRole;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Gate;
 
 class UserRoleController extends Controller
 {
@@ -17,6 +17,7 @@ class UserRoleController extends Controller
      */
     public function index()
     {
+        Gate::authorize('user role','view');
         return response()->json( [
             'items'=> UserRole::select('name', 'id')->paginate( $this->perPage )->onEachSide(2),
         ]);
@@ -31,6 +32,7 @@ class UserRoleController extends Controller
      */
     public function store(Request $request)
     {
+        Gate::authorize('user role','create');
         $request->validate([
             'name' => 'required|unique:user_roles'
         ]);
@@ -76,6 +78,7 @@ class UserRoleController extends Controller
      */
     public function update(Request $request, UserRole $userRole)
     {
+        Gate::authorize('user role','edit');
         $request->validate([
             'name' => [
                 'required',
@@ -113,6 +116,7 @@ class UserRoleController extends Controller
      */
     public function destroy(UserRole $userRole)
     {
+        Gate::authorize('user role','delete');
         $result = $userRole->delete();
         return $result
             ? response()->json([

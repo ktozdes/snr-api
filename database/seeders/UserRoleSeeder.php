@@ -34,18 +34,22 @@ class UserRoleSeeder extends Seeder
                 'permission_const_id' => $value,
                 'permissions' => '1111'
             ]);
-            RolePermission::create([
-                'name' => $key,
-                'user_role_id' => $operator->id,
-                'permission_const_id' => $value,
-                'permissions' => '1110'
-            ]);
-            RolePermission::create([
-                'name' => $key,
-                'user_role_id' => $client->id,
-                'permission_const_id' => $value,
-                'permissions' => '1000'
-            ]);
+            if (in_array($key, ['User', 'Post', 'Word'])) {
+                RolePermission::create([
+                    'name' => $key,
+                    'user_role_id' => $operator->id,
+                    'permission_const_id' => $value,
+                    'permissions' => '1110'
+                ]);
+            }
+            if (in_array($key, ['Post', 'Word'])) {
+                RolePermission::create([
+                    'name' => $key,
+                    'user_role_id' => $client->id,
+                    'permission_const_id' => $value,
+                    'permissions' => '1000'
+                ]);
+            }
         }
     }
 }

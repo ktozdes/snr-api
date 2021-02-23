@@ -4,11 +4,11 @@ return [
     'permissions' => [
     	'User' => 1,
     	'User Role' => 2,
-        'Address' => 3,
-        'Word' => 4,
-        'Post' => 5,
-        'Comment' => 6,
+        'Word' => 3,
+        'Post' => 4,
+        'Comment' => 5,
         'Organization' => 6,
-        'Keyword' => 6,
+        'Keyword' => 7,
+        'Permission' => 8,
     ],
 ];

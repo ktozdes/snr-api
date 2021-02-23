@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'user_role_id',
+        'organization_id',
+        'phone',
     ];
 
     /**
@@ -45,7 +48,10 @@ class User extends Authenticatable
     //protected $with = ['userRole.rolePermissions'];
 
     public function userRole() {
-        return $this->hasOne(UserRole::class, 'id', 'user_role_id');
+        return $this->belongsTo(UserRole::class);
+    }
+    public function organization() {
+        return $this->belongsTo(Organization::class);
     }
 
     public function getPermissionsAttribute()
@@ -77,7 +83,7 @@ class User extends Authenticatable
         return $returnValue;
     }
 
-    public function permission($perm_str, $module) {
+    public function checkPermission($perm_str, $module) {
         $role_perm = null;
         foreach ($this->userRole->rolePermissions as $perm) {
             if ($perm->permission_const_id == $module) {

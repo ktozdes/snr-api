@@ -12,9 +12,9 @@ class RolePermission extends Model
         'name', 'user_role_id', 'permission_const_id', 'permissions'
     ];
 
-    public static function checkPermission($permissionString, $permVal)
+    public static function checkPermission($action, $permVal)
     {
-        switch ($permissionString) {
+        switch ($action) {
             case 'view':
                 if ($permVal > 999) {
                     return true;

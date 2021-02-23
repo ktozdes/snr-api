@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\api\UserRoleController;
+use \App\Http\Controllers\api\UserController;
 use \App\Http\Controllers\api\RolePermissionController;
 use \App\Http\Controllers\api\AuthorizationController;
 use \App\Http\Controllers\api\WordController;
@@ -23,11 +24,8 @@ use \App\Http\Controllers\api\OrganizationController;
 */
 
 Route::middleware('auth:api')->group(function () {
-    Route::get('/users', function () {
-        // Matches The "/admin/users" URL
-    });
     Route::get('/user', function (Request $request) {
-        return response(['user' => $request->user(), 'permissions'=>$request->user()->permissions]);
+        return response();
     });
 
     Route::prefix('role')->group(function () {
@@ -40,8 +38,18 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('organization')->group(function () {
         Route::get('/', [OrganizationController::class, 'index'])->name('api.organization.index');
         Route::post('store', [OrganizationController::class, 'store'])->name('api.organization.store');
+        Route::get('edit/{organization}', [OrganizationController::class, 'edit'])->name('api.organization.edit');
         Route::post('update/{organization}', [OrganizationController::class, 'update'])->name('api.organization.update');
         Route::delete('destroy/{organization}', [OrganizationController::class, 'destroy'])->name('api.organization.destroy');
+    });
+
+    Route::prefix('user')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('api.user.index');
+        Route::get('/get', [UserController::class, 'get'])->name('api.user.get');
+        Route::post('store', [UserController::class, 'store'])->name('api.user.store');
+        Route::get('edit/{user?}', [UserController::class, 'edit'])->name('api.user.edit');
+        Route::post('update/{user}', [UserController::class, 'update'])->name('api.user.update');
+        Route::delete('destroy/{user}', [UserController::class, 'destroy'])->name('api.user.destroy');
     });
 
     Route::prefix('word')->group(function () {
@@ -49,6 +57,10 @@ Route::middleware('auth:api')->group(function () {
         Route::post('store', [WordController::class, 'store'])->name('api.word.store');
         Route::post('mass-store', [WordController::class, 'massStore'])->name('api.word.mass-store');
         Route::delete('destroy/{id}', [WordController::class, 'destroy'])->name('api.word.destroy');
+    });
+
+    Route::prefix('permission')->group(function () {
+        Route::get('/{userRole?}', [RolePermissionController::class, 'index'])->name('api.permission.index');
     });
 
     Route::prefix('post')->group(function () {
@@ -67,9 +79,6 @@ Route::middleware('auth:api')->group(function () {
 
 
 Route::middleware('api')->group(function () {
-    Route::prefix('permission')->group(function () {
-        Route::get('/{userRole?}', [RolePermissionController::class, 'index'])->name('api.permission.index');
-    });
 
     Route::prefix('image')->group(function () {
         Route::get('proxy/{imageName}', [ImageController::class, 'proxyImage'])->name('api.image.proxy');

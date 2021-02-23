@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -33,6 +34,11 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
+        $this->renderable(function (AccessDeniedHttpException $e, $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                ], $e->getStatusCode());
+        });
         $this->reportable(function (Throwable $e) {
             //
         });
