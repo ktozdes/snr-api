@@ -19,4 +19,8 @@ class Organization extends Model
     {
         return $this->hasMany(User::class);
     }
+    public function logo()
+    {
+        return $this->morphOne(Attachment::class,'attachable');
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
 use App\Models\User;
 use App\Models\UserRole;
 use Illuminate\Http\Request;
@@ -45,7 +46,18 @@ class AuthorizationController extends Controller
         }
 
         $accessToken = auth()->user()->createToken('authToken')->accessToken;
-        return response(['user' => auth()->user()->only(['id', 'name', 'email']), 'permissions'=>auth()->user()->permissions, 'access_token' => $accessToken]);
+        $organization = null;
+        if (auth()->user()->organization_id !== null) {
+            $organization = Organization::find(auth()->user()->organization_id);
+            $organization->load('keywords:name,organization_id');
+            $organization->load('logo:attachable_id,name,url,thumbnail_url');
+        }
+        return response([
+            'user' => auth()->user()->load('logo:attachable_id,name,url,thumbnail_url'),
+            'organization' => $organization,
+            'permissions'=>auth()->user()->permissions,
+            'access_token' => $accessToken
+        ]);
 
     }
 }

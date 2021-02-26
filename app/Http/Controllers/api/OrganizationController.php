@@ -7,6 +7,8 @@ use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Gate;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\File;
 
 class OrganizationController extends Controller
 {
@@ -17,7 +19,7 @@ class OrganizationController extends Controller
      */
     public function index()
     {
-        Gate::authorize('organization','view');
+        Gate::authorize('organization', 'view');
         return response()->json([
             'items' => Organization::select('*')->paginate($this->perPage)->onEachSide(2),
         ]);
@@ -27,11 +29,12 @@ class OrganizationController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
+     * @param ImageController $imageController
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request, ImageController $imageController)
     {
-        Gate::authorize('organization','create');
+        Gate::authorize('organization', 'create');
         $messages = [];
         $request->validate([
             'name' => 'required|unique:organizations'
@@ -50,6 +53,11 @@ class OrganizationController extends Controller
                 $keywordArray
             );
             $messages[] = $result ? __('Keywords assigned') : __('Keywords not assigned');
+        }
+
+        $imageUploadResult = $imageController->uploadLogo($request, $organization);
+        if ($imageUploadResult !== false ) {
+            $messages[] = $imageUploadResult;
         }
 
         return $organization
@@ -84,8 +92,8 @@ class OrganizationController extends Controller
      */
     public function edit(Organization $organization)
     {
-        Gate::authorize('organization','edit');
-        $organization->load('keywords');
+        Gate::authorize('organization', 'edit');
+        $organization->load(['keywords', 'logo']);
         return response()->json([
             'organization' => $organization,
         ]);
@@ -96,19 +104,22 @@ class OrganizationController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param \App\Models\Organization $organization
+     * @param ImageController $imageController
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, Organization $organization)
+    public function update(Request $request, Organization $organization, ImageController $imageController)
     {
-        Gate::authorize('organization','edit');
+        Gate::authorize('organization', 'edit');
         $messages = [];
         $request->validate([
-            'name' => ['required', Rule::unique('organizations')->ignore($organization)]
+            'name' => ['required', Rule::unique('organizations')->ignore($organization)],
+            //'image' => 'nullable|image'
         ]);
 
         $result = $organization->update(
             $request->all()
         );
+
         $messages[] = $result ? __('Organization updated') : __('Organization not updated');
         if (is_array($request->keywords) && count($request->keywords) > 0) {
             $organization->keywords()->delete();
@@ -122,13 +133,20 @@ class OrganizationController extends Controller
             $messages[] = $result ? __('Keywords assigned') : __('Keywords not assigned');
         }
 
-        return $organization
+        $imageUploadResult = $imageController->uploadLogo($request, $organization);
+        if ($imageUploadResult !== false ) {
+            $messages[] = $imageUploadResult;
+        }
+
+        $organization->load('keywords:name,organization_id');
+        $organization->load('logo:attachable_id,name,url,thumbnail_url');
+
+        return $result
             ? response()->json([
-                'result' => $result,
+                'organization' => $organization,
                 'success_message' => $messages
             ])
             : response()->json([
-                'result' => $result,
                 'error_message' => [
                     __('Something went wrong')
                 ]
@@ -143,7 +161,7 @@ class OrganizationController extends Controller
      */
     public function destroy(Organization $organization)
     {
-        Gate::authorize('organization','delete');
+        Gate::authorize('organization', 'delete');
         $result = $organization->delete();
         return $result
             ? response()->json([

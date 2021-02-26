@@ -53,12 +53,19 @@ class User extends Authenticatable
     public function organization() {
         return $this->belongsTo(Organization::class);
     }
+    public function logo()
+    {
+        return $this->morphOne(Attachment::class,'attachable');
+    }
 
     public function getPermissionsAttribute()
     {
-        $permissions = RolePermission::all();
-        $rolePermissions = $this->userRole->rolePermissions->keyBy('permission_const_id');
         $returnValue = [];
+        $permissions = RolePermission::all();
+        $rolePermissions = RolePermission::where([
+            'user_role_id'=>$this->user_role_id,
+        ])->get()->keyBy('permission_const_id');
+
         foreach ($permissions as $perm => $permission) {
             if (isset($rolePermissions[$permission->permission_const_id])) {
                 $returnValue[$permission->name] =[

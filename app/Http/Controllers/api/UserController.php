@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Gate;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\File;
 
 class UserController extends Controller
 {
@@ -23,6 +25,30 @@ class UserController extends Controller
         return response()->json([
             'items' => User::select('*')->with(['userRole:id,name', 'organization:id,name'])->paginate($this->perPage)->onEachSide(2),
         ]);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function get(Request $request)
+    {
+        $user = auth()->user();
+        $organization = null;
+        if (auth()->user()->organization_id !== null) {
+            $organization = Organization::find(auth()->user()->organization_id);
+            $organization->load('keywords:name,organization_id');
+            $organization->load('logo:attachable_id,name,url,thumbnail_url');
+        }
+
+        return response()->json([
+            'user' => $user->load('logo:attachable_id,name,url,thumbnail_url'),
+            'organization' => $organization,
+            'permissions' => $user->permissions
+        ]);
+
     }
 
     /**
@@ -61,21 +87,6 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function get(Request $request)
-    {
-        return response()->json([
-            'user' => $request->user(),
-            'permissions' => $request->user()->permissions
-        ]);
-
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param User $user
@@ -89,7 +100,7 @@ class UserController extends Controller
             'organizations' => Organization::select(['id', 'name'])->get(),
         ];
         if (isset($user)) {
-            $returnData['user'] = $user->load(['userRole:id,name', 'organization:id,name']);
+            $returnData['user'] = $user->load(['userRole:id,name', 'organization:id,name', 'logo']);
         }
         return response()->json(
             $returnData
@@ -101,15 +112,17 @@ class UserController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param User $user
+     * @param ImageController $imageController
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user, ImageController $imageController)
     {
         Gate::authorize('user','edit');
         $request->validate([
             'name' => 'required|max:55',
             'user_role_id' => 'required|integer'
         ]);
+        $messages = [];
         $tempUser = $request->all();
         if (isset($tempUser['password']) && strlen($tempUser['password']) > 0) {
             $passwordValidator = Validator::make($tempUser, [
@@ -122,14 +135,21 @@ class UserController extends Controller
         }
         unset($tempUser['email']);
         $result = $user->update($tempUser);
+        $messages[] = $result ? __('User updated') : __('User not updated');
         $user->createToken('authToken')->accessToken;
+
+        $imageUploadResult = $imageController->uploadLogo($request, $user);
+        if ($imageUploadResult !== false ) {
+            $messages[] = $imageUploadResult;
+        }
+
+        $user->load('logo:attachable_id,name,url,thumbnail_url');
+
         return $result
             ? response()->json([
-                'result' => $tempUser,
-                'result1' => $user,
-                'success_message' => [
-                    __('User updated')
-                ]
+                'result' => 1,
+                'user' => $user,
+                'success_message' => $messages
             ])
             : response()->json([
                 'result' => 0,
