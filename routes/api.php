@@ -66,6 +66,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('post')->group(function () {
         Route::get('/', [PostController::class, 'index'])->name('api.post.index');
         Route::get('/show/{postID}', [PostController::class, 'show'])->name('api.post.show');
+        Route::post('update-stats/{postID}', [PostController::class, 'updateStats'])->name('api.post.update-stats');
     });
     Route::prefix('comment')->group(function () {
         Route::get('/{postID}', [CommentController::class, 'index'])->name('api.comment.index');

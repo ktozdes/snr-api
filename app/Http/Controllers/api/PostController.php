@@ -46,27 +46,44 @@ class PostController extends Controller
      */
     public function show(ParserInterface $parserInterface, int $postID)
     {
-        $posts = Cache::get('posts');
-        foreach ($posts as $post) {
-            if (isset($post['id']) && $post['id'] == $postID) {
-                return response()->json([
-                    'post' => $post,
-                ]);
-            }
-        }
-
-        return response()->json([
-            'warning_message' => [
-                __('No record found')
-            ],
-        ]);
-
         $filter = [
             'id' => $postID
         ];
         $result = $parserInterface->post('api/post.get_post', (string)json_encode($filter));
         return response()->json([
-            'item' => $result,
+            'post' => $result->info,
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param ParserInterface $parserInterface
+     * @param Request $request
+     * @param $postID
+     * @return JsonResponse
+     */
+    public function updateStats(ParserInterface $parserInterface, Request $request, $postID)
+    {
+        $request->validate([
+            'positive' => 'nullable|integer',
+            'neutral' => 'nullable|integer',
+            'negative' => 'nullable|integer',
+        ]);
+
+        $filter = [
+            'created_by' => auth()->user()->id,
+            'id' => $postID,
+            'positive' => $request->positive,
+            'neutral' => $request->neutral,
+            'negative' => $request->negative,
+        ];
+
+        $parserInterface->post('api/post.update_statistics', (string)json_encode($filter));
+        return response()->json([
+            'success_message' => [
+                __('Post rating updated'),
+            ]
         ]);
     }
 }
