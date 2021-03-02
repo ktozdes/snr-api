@@ -21,7 +21,7 @@ class OrganizationController extends Controller
     {
         Gate::authorize('organization', 'view');
         return response()->json([
-            'items' => Organization::select('*')->paginate($this->perPage)->onEachSide(2),
+            'items' => Organization::select('*')->with('logo')->paginate($this->perPage)->onEachSide(2),
         ]);
     }
 

@@ -60,5 +60,13 @@ class PostController extends Controller
                 __('No record found')
             ],
         ]);
+
+        $filter = [
+            'id' => $postID
+        ];
+        $result = $parserInterface->post('api/post.get_post', (string)json_encode($filter));
+        return response()->json([
+            'item' => $result,
+        ]);
     }
 }

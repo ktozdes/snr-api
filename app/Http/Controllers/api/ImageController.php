@@ -34,7 +34,7 @@ class ImageController extends Controller
             $image_type = explode("image/", explode(";base64", $request->image)[0]);
             $mime_type = '.' . $image_type[1];
             $filename = auth()->user()->id . '_' . time() . $mime_type;
-            if (!in_array( strtolower($mime_type) ,['jpeg', 'png', 'jpg'])) {
+            if (!in_array( strtolower($mime_type) ,['.jpeg', '.png', '.jpg'])) {
                 return false;
             }
             if ($model->logo()->first()) {

@@ -18,7 +18,7 @@ class WordController extends Controller
     public function index(ParserInterface $parserInterface)
     {
         $result = $parserInterface->post('api/word.get_list');
-        $words = Word::hydrate( $result->list );
+        $words = Word::hydrate($result->list);
         return response()->json([
             'items' => $words
         ]);
@@ -27,7 +27,7 @@ class WordController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @param ParserInterface $parserInterface
      * @return \Illuminate\Http\JsonResponse
      */
@@ -40,12 +40,12 @@ class WordController extends Controller
             'positive_total' => 'nullable|integer',
         ]);
         $result = $parserInterface->post('api/word.create', json_encode([
-            'word'=> $request->word,
-            'positive'=> $request->positive_total,
-            'neutral'=> $request->neutral_total,
-            'negative'=> $request->negative_total,
-            'amount'=> ($request->positive_total + $request->neutral_total + $request->negative_total),
-        ]) );
+            'word' => $request->word,
+            'positive' => $request->positive_total,
+            'neutral' => $request->neutral_total,
+            'negative' => $request->negative_total,
+            'amount' => ($request->positive_total + $request->neutral_total + $request->negative_total),
+        ]));
         return (isset($result->id))
             ? response()->json([
                 'result' => $result,
@@ -72,28 +72,64 @@ class WordController extends Controller
     public function massStore(Request $request, ParserInterface $parserInterface, int $commentID)
     {
         $result = false;
-        if (isset($request->words) && count($request->words) > 0 && is_numeric($commentID)) {
-            foreach ($request->words as $word) {
-                $result = $parserInterface->post('api/post.add_word', json_encode([
-                    'word'=> $word['word'],
-                    'comment_id'=> $commentID,
-                    'type'=> $word['type'],
-                    'index'=> $word['index'],
-                ]) );
+
+        $filter = [
+            'id' => $commentID
+        ];
+        $comment = $parserInterface->post('api/post.get_comment', (string)json_encode($filter));
+        $array = json_decode(json_encode($comment->info->words), true);
+        $newWords = $request->words;
+
+        //syncing old words
+        foreach ($array as $oldWord) {
+            $found = false;
+            foreach ($newWords as $key => $newWord) {
+                if (
+                    (isset($newWord['index']) && isset($oldWord['index']) && $newWord['index'] == $oldWord['index'])
+                    && (isset($newWord['word']) && isset($oldWord['word']) && $newWord['word'] == $oldWord['word'])
+                    && (isset($newWord['type']) && isset($oldWord['type']) && $newWord['type'] == $oldWord['type'])) {
+                    $found = true;
+                    unset($newWords[$key]);
+                    break;
+                }
+                else if (
+                    (isset($newWord['index']) && isset($oldWord['index']) && $newWord['index'] == $oldWord['index'])
+                    && (isset($newWord['word']) && isset($oldWord['word']) && $newWord['word'] == $oldWord['word'])
+                    && (isset($newWord['type']) && isset($oldWord['type']) && $newWord['type'] != $oldWord['type'])) {
+                    $found = true;
+                    $parserInterface->post('api/post.del_word', json_encode([
+                        'word' => $oldWord['word'],
+                        'comment_id' => $commentID,
+                        'index' => $oldWord['index'],
+                    ]));
+                    break;
+                }
+            }
+            if ($found === false) {
+                $parserInterface->post('api/post.del_word', json_encode([
+                    'word' => $oldWord['word'],
+                    'comment_id' => $commentID,
+                    'index' => $oldWord['index'],
+                ]));
             }
         }
 
-        return (isset($result->id))
-            ? response()->json([
+        //saving new words
+        if (isset($newWords) && count($newWords) > 0) {
+            foreach ($newWords as $word) {
+                $result = $parserInterface->post('api/post.add_word', json_encode([
+                    'word' => $word['word'],
+                    'comment_id' => $commentID,
+                    'type' => $word['type'],
+                    'index' => $word['index'],
+                ]));
+            }
+        }
+        return
+            response()->json([
                 'result' => $result,
                 'success_message' => [
-                    __('Words created'),
-                ]
-            ])
-            : response()->json([
-                'result' => $result,
-                'error_message' => [
-                    __('Something went wrong')
+                    __('Words synced'),
                 ]
             ]);
     }
@@ -101,7 +137,7 @@ class WordController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -112,8 +148,8 @@ class WordController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -131,7 +167,7 @@ class WordController extends Controller
     public function destroy(int $id, ParserInterface $parserInterface)
     {
         $result = $parserInterface->post('api/word.delete', json_encode([
-            'id'=> $id,]) );
+            'id' => $id,]));
         return (isset($result->id))
             ? response()->json([
                 'result' => $result,

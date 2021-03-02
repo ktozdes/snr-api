@@ -69,6 +69,7 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::prefix('comment')->group(function () {
         Route::get('/{postID}', [CommentController::class, 'index'])->name('api.comment.index');
+        Route::get('/show/{commentID}', [CommentController::class, 'show'])->name('api.comment.show');
     });
 
     Route::get('/test-close', function (Request $request) {
