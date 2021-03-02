@@ -94,7 +94,9 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        Gate::authorize('user','edit');
+        if ( auth()->user()->id != $user->id ) {
+            Gate::authorize('user','edit');
+        }
         $returnData = [
             'roles' => UserRole::select(['id', 'name'])->get(),
             'organizations' => Organization::select(['id', 'name'])->get(),
@@ -117,7 +119,9 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user, ImageController $imageController)
     {
-        Gate::authorize('user','edit');
+        if ( auth()->user()->id != $user->id ) {
+            Gate::authorize('user','edit');
+        }
         $request->validate([
             'name' => 'required|max:55',
             'user_role_id' => 'required|integer'
