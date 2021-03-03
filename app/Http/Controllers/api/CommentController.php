@@ -92,4 +92,36 @@ class CommentController extends Controller
     {
         //
     }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param ParserInterface $parserInterface
+     * @param Request $request
+     * @param $postID
+     * @return JsonResponse
+     */
+    public function updateStats(ParserInterface $parserInterface, Request $request, $commentID)
+    {
+        $request->validate([
+            'positive' => 'nullable|integer',
+            'neutral' => 'nullable|integer',
+            'negative' => 'nullable|integer',
+        ]);
+
+        $filter = [
+            'created_by' => auth()->user()->id,
+            'id' => $commentID,
+            'positive' => $request->positive,
+            'neutral' => $request->neutral,
+            'negative' => $request->negative,
+        ];
+
+        $parserInterface->post('api/post.update_comment_statistics', (string)json_encode($filter));
+        return response()->json([
+            'success_message' => [
+                __('Comment rating updated'),
+            ]
+        ]);
+    }
 }

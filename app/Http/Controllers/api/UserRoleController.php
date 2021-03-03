@@ -82,8 +82,6 @@ class UserRoleController extends Controller
         $request->validate([
             'name' => [
                 'required',
-                //'unique:user_roles',
-                //Rule::unique('user_roles')->ignore($userRole->id)
             ]
         ]);
         $userRole->update([
@@ -143,6 +141,7 @@ class UserRoleController extends Controller
     {
         $data = [];
         foreach ($permissions as $perm => $val) {
+            $data[$val]['name'] = $perm;
             $data[$val]['user_role_id'] = $userRole->id;
             $data[$val]['permission_const_id'] = $val;
 

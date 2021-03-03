@@ -24,13 +24,16 @@ class PostController extends Controller
             'page' => (int)$request->page ?? 1,
             'count' => $this->perPage,
         ];
+        if (is_array($request->keywords) && count($request->keywords) > 0) {
+            $filter['hashtags'] = $request->keywords;
+        }
         $result = $parserInterface->post('api/post.get_posts', (string)json_encode($filter));
-        Cache::forget('posts');
-        $posts = Cache::remember('posts', config('app.day_in_seconds', (60 * 60 * 24)), function () use ($result) {
-            return Post::hydrate($result->list);
-        });
+
+        $posts = Post::hydrate($result->list);
+        
         return response()->json([
             'items' => $posts,
+            'filter' => $filter,
             'pagination' => [
                 'page_count' => $result->page_count
             ]
