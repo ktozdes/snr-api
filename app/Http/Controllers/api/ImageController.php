@@ -48,7 +48,7 @@ class ImageController extends Controller
             }
 
             $logo = Image::make(file_get_contents($request->image))->save(public_path() . '/images/' . $filename);
-            $thumbnailLogo = $logo->resize(150, null, function ($constraint) {
+            $thumbnailLogo = $logo->resize(null, 150, function ($constraint) {
                 $constraint->aspectRatio();
             });
             $thumbnailLogo->save(public_path() . '/images/thumbnails/' . $filename);
