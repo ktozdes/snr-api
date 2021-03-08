@@ -37,6 +37,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('organization')->group(function () {
         Route::get('/', [OrganizationController::class, 'index'])->name('api.organization.index');
+        Route::get('show/{organization}', [OrganizationController::class, 'show'])->name('api.organization.show');
         Route::post('store', [OrganizationController::class, 'store'])->name('api.organization.store');
         Route::get('edit/{organization}', [OrganizationController::class, 'edit'])->name('api.organization.edit');
         Route::post('update/{organization}', [OrganizationController::class, 'update'])->name('api.organization.update');
@@ -56,6 +57,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/', [WordController::class, 'index'])->name('api.word.index');
         Route::post('store', [WordController::class, 'store'])->name('api.word.store');
         Route::post('mass-store/{commentID}', [WordController::class, 'massStore'])->name('api.word.mass-store');
+        Route::post('mass-store-post/{postID}', [WordController::class, 'massStorePost'])->name('api.word.mass-store-post');
         Route::delete('destroy/{id}', [WordController::class, 'destroy'])->name('api.word.destroy');
     });
 

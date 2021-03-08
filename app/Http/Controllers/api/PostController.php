@@ -23,17 +23,18 @@ class PostController extends Controller
         $filter = [
             'page' => (int)$request->page ?? 1,
             'count' => $this->perPage,
+            'hashtags' => []
         ];
         if (is_array($request->keywords) && count($request->keywords) > 0) {
-            $filter['hashtags'] = $request->keywords;
+            $filter['keywords'] = $request->keywords;
         }
-        $result = $parserInterface->post('api/post.get_posts', (string)json_encode($filter));
+        $result = $parserInterface->post('api/post.get_posts', (string)json_encode($filter, JSON_UNESCAPED_UNICODE));
 
         $posts = Post::hydrate($result->list);
-        
+
         return response()->json([
             'items' => $posts,
-            'filter' => $filter,
+            'filter' => (string)json_encode($filter, JSON_UNESCAPED_UNICODE),
             'pagination' => [
                 'page_count' => $result->page_count
             ]

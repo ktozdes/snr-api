@@ -56,7 +56,7 @@ class OrganizationController extends Controller
         }
 
         $imageUploadResult = $imageController->uploadLogo($request, $organization);
-        if ($imageUploadResult !== false ) {
+        if ($imageUploadResult !== false) {
             $messages[] = $imageUploadResult;
         }
 
@@ -81,7 +81,11 @@ class OrganizationController extends Controller
      */
     public function show(Organization $organization)
     {
-        //
+        $organization->load('keywords:name,organization_id');
+        $organization->load('logo:attachable_id,name,url,thumbnail_url');
+        return response()->json([
+            'organization' => $organization
+        ]);
     }
 
     /**
@@ -107,7 +111,8 @@ class OrganizationController extends Controller
      * @param ImageController $imageController
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, Organization $organization, ImageController $imageController)
+    public
+    function update(Request $request, Organization $organization, ImageController $imageController)
     {
         Gate::authorize('organization', 'edit');
         $messages = [];
@@ -134,7 +139,7 @@ class OrganizationController extends Controller
         }
 
         $imageUploadResult = $imageController->uploadLogo($request, $organization);
-        if ($imageUploadResult !== false ) {
+        if ($imageUploadResult !== false) {
             $messages[] = $imageUploadResult;
         }
 
@@ -159,7 +164,8 @@ class OrganizationController extends Controller
      * @param \App\Models\Organization $organization
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Organization $organization)
+    public
+    function destroy(Organization $organization)
     {
         Gate::authorize('organization', 'delete');
         $result = $organization->delete();

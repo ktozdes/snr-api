@@ -135,6 +135,79 @@ class WordController extends Controller
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param ParserInterface $parserInterface
+     * @param int $commentID
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function massStorePost(Request $request, ParserInterface $parserInterface, int $postID)
+    {
+        $result = false;
+
+        $filter = [
+            'id' => $postID
+        ];
+        $newWords = $request->words;
+//        $comment = $parserInterface->post('api/post.get_comment', (string)json_encode($filter));
+//        $array = json_decode(json_encode($comment->info->words), true);
+//
+//        //syncing old words
+//        foreach ($array as $oldWord) {
+//            $found = false;
+//            foreach ($newWords as $key => $newWord) {
+//                if (
+//                    (isset($newWord['index']) && isset($oldWord['index']) && $newWord['index'] == $oldWord['index'])
+//                    && (isset($newWord['word']) && isset($oldWord['word']) && $newWord['word'] == $oldWord['word'])
+//                    && (isset($newWord['type']) && isset($oldWord['type']) && $newWord['type'] == $oldWord['type'])) {
+//                    $found = true;
+//                    unset($newWords[$key]);
+//                    break;
+//                }
+//                else if (
+//                    (isset($newWord['index']) && isset($oldWord['index']) && $newWord['index'] == $oldWord['index'])
+//                    && (isset($newWord['word']) && isset($oldWord['word']) && $newWord['word'] == $oldWord['word'])
+//                    && (isset($newWord['type']) && isset($oldWord['type']) && $newWord['type'] != $oldWord['type'])) {
+//                    $found = true;
+//                    $parserInterface->post('api/post.del_word', json_encode([
+//                        'word' => $oldWord['word'],
+//                        'comment_id' => $postID,
+//                        'index' => $oldWord['index'],
+//                    ]));
+//                    break;
+//                }
+//            }
+//            if ($found === false) {
+//                $parserInterface->post('api/post.del_word', json_encode([
+//                    'word' => $oldWord['word'],
+//                    'comment_id' => $postID,
+//                    'index' => $oldWord['index'],
+//                ]));
+//            }
+//        }
+
+        //saving new words
+        if (isset($newWords) && count($newWords) > 0) {
+            foreach ($newWords as $word) {
+                $result = $parserInterface->post('api/post.add_word_to_post', json_encode([
+                    'word' => $word['word'],
+                    'post_id' => $postID,
+                    'type' => $word['type'],
+                    'index' => $word['index'],
+                ]));
+            }
+        }
+        return
+            response()->json([
+                'result' => $result,
+                'success_message' => [
+                    __('Words synced'),
+                ]
+            ]);
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param int $id

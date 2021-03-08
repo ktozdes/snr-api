@@ -30,7 +30,10 @@ class CommentController extends Controller
             $result = $parserInterface->post('api/post.get_comments', (string)json_encode($filter));
             $comments = Comment::hydrate($result->list);
             return response()->json([
-                'items' => $comments
+                'items' => $comments,
+                'pagination' => [
+                    'page_count' => $result->page_count
+                ]
             ]);
         }
         return response()->json([
