@@ -23,7 +23,7 @@ class UserController extends Controller
     {
         Gate::authorize('user','view');
         return response()->json([
-            'items' => User::select('*')->with(['userRole:id,name', 'organization:id,name'])->paginate($this->perPage)->onEachSide(2),
+            'items' => User::select('*')->with(['userRole:id,name', 'organization:id,name', 'logo'])->paginate($this->perPage)->onEachSide(2),
         ]);
     }
 
