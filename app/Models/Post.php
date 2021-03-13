@@ -14,10 +14,10 @@ class Post extends Model
 
     public function getFormattedDateAttribute()
     {
-        return isset($this->date) && !is_null($this->date) ? $this->date->format('d-m-Y') : null;
+        return isset($this->date) && !is_null($this->date) ? $this->date->format('d-m-Y H:m:s') : null;
     }
     public function getFormattedUpdatedDateAttribute()
     {
-        return isset($this->date_update) && !is_null($this->date_update) ? $this->date_update->format('d-m-Y') : null;
+        return isset($this->date_update) && !is_null($this->date_update) ? $this->date_update->format('d-m-Y H:m:s') : null;
     }
 }

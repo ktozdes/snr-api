@@ -7,7 +7,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Interfaces\ParserInterface;
-use Illuminate\Support\Facades\Cache;
 
 class PostController extends Controller
 {
@@ -27,6 +26,20 @@ class PostController extends Controller
         ];
         if (is_array($request->keywords) && count($request->keywords) > 0) {
             $filter['keywords'] = $request->keywords;
+        }
+        if (isset($request->sort_by) && in_array( $request->sort_by,['id_desc', 'id_asc', 'created_date_asc', 'created_date_desc',  'updated_date_asc', 'updated_date_desc']) ) {
+            $field = 'id';
+            $sortOption = strpos($request->sort_by, 'desc') !== false ? 'desc' : 'asc';
+            if ( in_array( $request->sort_by, ['created_date_asc', 'created_date_desc']) ) {
+                $field = 'date';
+            }
+            else if ( in_array( $request->sort_by, ['updated_date_asc', 'updated_date_desc']) ) {
+                $field = 'date_update';
+            }
+            $filter['sort'][] = [
+                'field'=> $field,
+                'value'=> $sortOption,
+            ];
         }
         $result = $parserInterface->post('api/post.get_posts', (string)json_encode($filter, JSON_UNESCAPED_UNICODE));
 
@@ -54,8 +67,13 @@ class PostController extends Controller
             'id' => $postID
         ];
         $result = $parserInterface->post('api/post.get_post', (string)json_encode($filter));
+        $postArray = (array) $result->info;
+        $post = new Post( $postArray );
+        $post->date_update = $postArray['date_update'];
+        $post->id = $postArray['id'];
+        $post->words = isset($postArray['words']) ? $postArray['words']: [];
         return response()->json([
-            'post' => $result->info,
+            'post' => $post,
         ]);
     }
 

@@ -15,12 +15,19 @@ class WordController extends Controller
      * @param ParserInterface $parserInterface
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(ParserInterface $parserInterface)
+    public function index(ParserInterface $parserInterface, Request $request)
     {
-        $result = $parserInterface->post('api/word.get_list');
+        $filter = [
+            'page' => (int)$request->page > 0 ? (int)$request->page : 1,
+            'count' => 10,
+        ];
+        $result = $parserInterface->post('api/word.get_list', (string)json_encode($filter));
         $words = Word::hydrate($result->list);
         return response()->json([
-            'items' => $words
+            'items' => $words,
+            'pagination' => [
+                'page_count' => $result->page_count
+            ]
         ]);
     }
 
@@ -91,8 +98,7 @@ class WordController extends Controller
                     $found = true;
                     unset($newWords[$key]);
                     break;
-                }
-                else if (
+                } else if (
                     (isset($newWord['index']) && isset($oldWord['index']) && $newWord['index'] == $oldWord['index'])
                     && (isset($newWord['word']) && isset($oldWord['word']) && $newWord['word'] == $oldWord['word'])
                     && (isset($newWord['type']) && isset($oldWord['type']) && $newWord['type'] != $oldWord['type'])) {

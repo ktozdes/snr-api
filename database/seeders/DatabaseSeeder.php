@@ -19,10 +19,11 @@ class DatabaseSeeder extends Seeder
                 OrganizationSeeder::class,
                 KeywordSeeder::class,
             ]);
+        }
+
         $this->call([
             UserRoleSeeder::class,
             UserSeeder::class,
         ]);
-        }
     }
 }
