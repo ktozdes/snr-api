@@ -91,10 +91,10 @@ Route::middleware('api')->group(function () {
     });
 
     Route::get('/test', function (Request $request) {
-            return [
-                'data' => 'testing connection',
-                'bearer' => $request->header('Authorization')
-            ];
+        return [
+            'data' => 'testing connection',
+            'bearer' => $request->header('Authorization')
+        ];
     });
     Route::post('/register', [AuthorizationController::class, 'register'])->name('api.register');
     Route::post('/login', [AuthorizationController::class, 'login'])->name('api.login');

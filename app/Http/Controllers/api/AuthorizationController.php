@@ -51,6 +51,7 @@ class AuthorizationController extends Controller
             $organization = Organization::find(auth()->user()->organization_id);
             $organization->load('keywords:name,organization_id');
             $organization->load('logo:attachable_id,name,url,thumbnail_url');
+            auth()->user()->load('keywords:id,name');
         }
         return response([
             'user' => auth()->user()->load('logo:attachable_id,name,url,thumbnail_url'),

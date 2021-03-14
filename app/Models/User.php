@@ -45,14 +45,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    //protected $with = ['userRole.rolePermissions'];
-
-    public function userRole() {
+    public function userRole()
+    {
         return $this->belongsTo(UserRole::class);
     }
-    public function organization() {
+
+    public function organization()
+    {
         return $this->belongsTo(Organization::class);
     }
+
+    public function keywords()
+    {
+        return $this->morphToMany(Keyword::class, 'keywordable');
+    }
+
     public function logo()
     {
         return $this->morphOne(Attachment::class,'attachable');

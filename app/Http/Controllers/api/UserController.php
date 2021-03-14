@@ -21,7 +21,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        Gate::authorize('user','view');
+        Gate::authorize('user', 'view');
         return response()->json([
             'items' => User::select('*')->with(['userRole:id,name', 'organization:id,name', 'logo'])->paginate($this->perPage)->onEachSide(2),
         ]);
@@ -41,6 +41,7 @@ class UserController extends Controller
             $organization = Organization::find(auth()->user()->organization_id);
             $organization->load('keywords:name,organization_id');
             $organization->load('logo:attachable_id,name,url,thumbnail_url');
+            $user->load('keywords:id,name');
         }
 
         return response()->json([
@@ -55,22 +56,34 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
+     * @param ImageController $imageController
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request, ImageController $imageController)
     {
-        Gate::authorize('user','create');
+        Gate::authorize('user', 'create');
         $validatedData = $request->validate([
             'name' => 'required|max:55',
             'email' => 'email|required|unique:users',
             'password' => 'required|confirmed',
             'phone' => 'string',
-            'user_role_id' => 'required|integer'
+            'user_role_id' => 'required|integer',
+            'organization_id' => 'nullable|integer',
         ]);
 
         $validatedData['password'] = bcrypt($request->password);
         $user = User::create($validatedData);
         $user->createToken('authToken')->accessToken;
+
+        $imageUploadResult = $imageController->uploadLogo($request, $user);
+        if ($imageUploadResult !== false) {
+            $messages[] = $imageUploadResult;
+        }
+
+        if (is_array($request->keywords)) {
+            $user->keywords()->sync($request->keywords);
+        }
+
         return $user
             ? response()->json([
                 'result' => 1,
@@ -94,15 +107,15 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        if ( auth()->user()->id != $user->id ) {
-            Gate::authorize('user','edit');
+        if (auth()->user()->id != $user->id) {
+            Gate::authorize('user', 'edit');
         }
         $returnData = [
             'roles' => UserRole::select(['id', 'name'])->get(),
-            'organizations' => Organization::select(['id', 'name'])->get(),
+            'organizations' => Organization::select(['id', 'name'])->with('keywords')->get(),
         ];
         if (isset($user)) {
-            $returnData['user'] = $user->load(['userRole:id,name', 'organization:id,name', 'logo']);
+            $returnData['user'] = $user->load(['userRole:id,name', 'keywords:id', 'logo']);
         }
         return response()->json(
             $returnData
@@ -119,8 +132,8 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user, ImageController $imageController)
     {
-        if ( auth()->user()->id != $user->id ) {
-            Gate::authorize('user','edit');
+        if (auth()->user()->id != $user->id) {
+            Gate::authorize('user', 'edit');
         }
         $request->validate([
             'name' => 'required|max:55',
@@ -143,8 +156,12 @@ class UserController extends Controller
         $user->createToken('authToken')->accessToken;
 
         $imageUploadResult = $imageController->uploadLogo($request, $user);
-        if ($imageUploadResult !== false ) {
+        if ($imageUploadResult !== false) {
             $messages[] = $imageUploadResult;
+        }
+
+        if (is_array($request->keywords)) {
+            $user->keywords()->sync($request->keywords);
         }
 
         $user->load('logo:attachable_id,name,url,thumbnail_url');
@@ -171,7 +188,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        Gate::authorize('user','delete');
+        Gate::authorize('user', 'delete');
         $result = $user->delete();
         return $result
             ? response()->json([
