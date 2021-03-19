@@ -9,8 +9,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Gate;
-use Intervention\Image\Facades\Image;
-use Illuminate\Support\Facades\File;
 
 class UserController extends Controller
 {
@@ -165,6 +163,7 @@ class UserController extends Controller
         }
 
         $user->load('logo:attachable_id,name,url,thumbnail_url');
+        $user->load('keywords:id,name');
 
         return $result
             ? response()->json([

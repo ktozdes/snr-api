@@ -10,5 +10,6 @@ return [
         'Organization' => 6,
         'Keyword' => 7,
         'Permission' => 8,
+        'Social Network User' => 8,
     ],
 ];

@@ -11,6 +11,8 @@ use \App\Http\Controllers\api\PostController;
 use \App\Http\Controllers\api\CommentController;
 use \App\Http\Controllers\api\ImageController;
 use \App\Http\Controllers\api\OrganizationController;
+use \App\Http\Controllers\api\KeywordController;
+use \App\Http\Controllers\api\SocialNetworkUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,9 +62,17 @@ Route::middleware('auth:api')->group(function () {
         Route::post('mass-store-post/{postID}', [WordController::class, 'massStorePost'])->name('api.word.mass-store-post');
         Route::delete('destroy/{id}', [WordController::class, 'destroy'])->name('api.word.destroy');
     });
+    Route::prefix('social-network-user')->group(function () {
+        Route::get('/', [SocialNetworkUserController::class, 'index'])->name('api.social-network-user.index');
+    });
 
     Route::prefix('permission')->group(function () {
         Route::get('/{userRole?}', [RolePermissionController::class, 'index'])->name('api.permission.index');
+    });
+
+    Route::prefix('keyword')->group(function () {
+        Route::post('/user-sync/{user}', [KeywordController::class, 'userSync'])->name('api.keyword.user-sync');
+        Route::post('/organization-sync/{organization}', [KeywordController::class, 'organizationSync'])->name('api.keyword.organization-sync');
     });
 
     Route::prefix('post')->group(function () {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\ParserInterface;
 use App\Models\Word;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class WordController extends Controller
 {
@@ -17,6 +18,7 @@ class WordController extends Controller
      */
     public function index(ParserInterface $parserInterface, Request $request)
     {
+        Gate::authorize('word', 'view');
         $filter = [
             'page' => (int)$request->page > 0 ? (int)$request->page : 1,
             'count' => 10,
@@ -40,6 +42,7 @@ class WordController extends Controller
      */
     public function store(Request $request, ParserInterface $parserInterface)
     {
+        Gate::authorize('word', 'create');
         $request->validate([
             'word' => 'required',
             'neutral_total' => 'nullable|integer',
@@ -78,6 +81,7 @@ class WordController extends Controller
      */
     public function massStore(Request $request, ParserInterface $parserInterface, int $commentID)
     {
+        Gate::authorize('word', 'create');
         $result = false;
 
         $filter = [
@@ -214,29 +218,6 @@ class WordController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param int $id
@@ -245,6 +226,7 @@ class WordController extends Controller
      */
     public function destroy(int $id, ParserInterface $parserInterface)
     {
+        Gate::authorize('word', 'delete');
         $result = $parserInterface->post('api/word.delete', json_encode([
             'id' => $id,]));
         return (isset($result->id))

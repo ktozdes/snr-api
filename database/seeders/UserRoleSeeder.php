@@ -34,7 +34,7 @@ class UserRoleSeeder extends Seeder
                 'permission_const_id' => $value,
                 'permissions' => '1111'
             ]);
-            if (in_array($key, ['User', 'Post', 'Word'])) {
+            if (in_array($key, ['User', 'Post', 'Word', 'Social Network User'])) {
                 RolePermission::create([
                     'name' => $key,
                     'user_role_id' => $operator->id,
