@@ -13,6 +13,7 @@ use \App\Http\Controllers\api\ImageController;
 use \App\Http\Controllers\api\OrganizationController;
 use \App\Http\Controllers\api\KeywordController;
 use \App\Http\Controllers\api\SocialNetworkUserController;
+use \App\Http\Controllers\api\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,8 +63,14 @@ Route::middleware('auth:api')->group(function () {
         Route::post('mass-store-post/{postID}', [WordController::class, 'massStorePost'])->name('api.word.mass-store-post');
         Route::delete('destroy/{id}', [WordController::class, 'destroy'])->name('api.word.destroy');
     });
+
     Route::prefix('social-network-user')->group(function () {
         Route::get('/', [SocialNetworkUserController::class, 'index'])->name('api.social-network-user.index');
+        Route::get('comments/{userID}', [SocialNetworkUserController::class, 'comments'])->name('api.social-network-user.comments');
+    });
+
+    Route::prefix('report')->group(function () {
+        Route::get('/total', [ReportController::class, 'total'])->name('api.report.total');
     });
 
     Route::prefix('permission')->group(function () {
