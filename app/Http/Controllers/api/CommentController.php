@@ -27,10 +27,12 @@ class CommentController extends Controller
                 'page' => (int)$request->page > 0 ? (int)$request->page : 1,
                 'count' => $this->perPage,
             ];
+            $filter['sort'][] = $this->sortBy($request);
             $result = $parserInterface->post('api/post.get_comments', (string)json_encode($filter));
             $comments = Comment::hydrate($result->list);
             return response()->json([
                 'items' => $comments,
+                'filter'=> $filter,
                 'pagination' => [
                     'page_count' => $result->page_count
                 ]

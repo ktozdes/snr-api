@@ -15,6 +15,6 @@ class Comment extends Model
 
     public function getFormattedDateAttribute()
     {
-        return isset($this->date) && !is_null($this->date) ? $this->date->format('d-m-Y') : null;
+        return isset($this->date) && !is_null($this->date) ? $this->date->format('d-m-Y H:m:s') : null;
     }
 }

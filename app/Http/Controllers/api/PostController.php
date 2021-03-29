@@ -22,17 +22,20 @@ class PostController extends Controller
     {
         Gate::authorize('post', 'view');
         $filter = [
-            'page' => (int)$request->page ?? 1,
-            'count' => $this->perPage,
+            'page' => (int) $request->page ?? 1,
+            'count' => (int) $this->perPage,
             'hashtags' => []
         ];
+        if (isset($request->per_page) && is_numeric($request->per_page) ) {
+            $filter['count'] = (int) $request->per_page;
+        }
         if (is_array($request->keywords) && count($request->keywords) > 0) {
             $filter['keywords'] = $request->keywords;
         }
         if (isset($request->author_username)) {
             $filter['author_username'] = $request->author_username;
         }
-        if (isset($request->sort_by) && in_array( $request->sort_by,['id_desc', 'id_asc', 'created_date_asc', 'created_date_desc',  'updated_date_asc', 'updated_date_desc']) ) {
+        if (isset($request->sort_by) && in_array( $request->sort_by,['id_desc', 'id_asc', 'created_date_asc', 'created_date_desc',  'updated_date_asc', 'updated_date_desc', 'like_count_desc', 'like_count_asc']) ) {
             $field = 'id';
             $sortOption = strpos($request->sort_by, 'desc') !== false ? 'desc' : 'asc';
             if ( in_array( $request->sort_by, ['created_date_asc', 'created_date_desc']) ) {
@@ -40,6 +43,9 @@ class PostController extends Controller
             }
             else if ( in_array( $request->sort_by, ['updated_date_asc', 'updated_date_desc']) ) {
                 $field = 'date_update';
+            }
+            else {
+                $field = str_replace(['_desc', '_asc'], '', $request->sort_by);
             }
             $filter['sort'][] = [
                 'field'=> $field,
@@ -52,7 +58,7 @@ class PostController extends Controller
 
         return response()->json([
             'items' => $posts,
-            'filter' => (string)json_encode($filter, JSON_UNESCAPED_UNICODE),
+            'filter' => $filter,
             'pagination' => [
                 'page_count' => $result->page_count
             ]
